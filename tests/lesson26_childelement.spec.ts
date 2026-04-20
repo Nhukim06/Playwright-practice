@@ -38,7 +38,7 @@ test.skip('locating parent elements', async ({ page }) => {
     await page.locator(':text-is("Using the Grid")').locator('..').getByRole('textbox', { name: "Email" }).click()
 })
 
-test('Reusing locator', async ({ page }) => {
+test.skip('Reusing locator', async ({ page }) => {
     //create constant de tranh duplication
 
     const basicForm = page.locator('nb-card').filter({ hasText: "Basic form" })
@@ -51,4 +51,29 @@ test('Reusing locator', async ({ page }) => {
     await basicForm.getByRole('button', { name: "SUBMIT" }).click()
 
     await expect(emailField).toHaveValue('nhukim@gmail.com')
+})
+
+test('extracting values', async ({ page }) => {
+    //single test value'
+    //Submit la text nam ben trong the html <button>Submit</button>
+    const basicForm = page.locator('nb-card').filter({ hasText: "Basic form" })
+    const buttonText = await basicForm.locator('button').textContent()
+    expect(buttonText).toEqual('Submit')
+
+    //all text value
+    const allRadioButtonsLabels = await page.locator('nb-radio').allTextContents()
+    expect(allRadioButtonsLabels).toContain('Option 2')
+
+    //input text
+    const emailField = basicForm.getByRole('textbox', { name: "Email" })
+    await emailField.fill('nhukim@gmail.com')
+    const emailValue = await emailField.inputValue()
+    expect(emailValue).toEqual('nhukim@gmail.com')
+
+    //getAttribute de lay gia tri cua mot HTML attribute vi du <input placeholder=="email" ==> email la value
+    const placeholderValue = await emailField.getAttribute('placeholder')
+    expect(placeholderValue).toEqual('Email')
+
+
+
 })
